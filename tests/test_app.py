@@ -1,6 +1,6 @@
 import pytest
 import json
-from app import app
+from app import app  # Ensure this import is correct
 
 @pytest.fixture
 def client():
@@ -29,7 +29,7 @@ def test_invalid_bathrooms(client):
     response = client.post('/predict', json={
         'area': 7420,
         'bedrooms': 4,
-        'bathrooms': -2,  # Invalid input
+        'bathrooms': -2,
         'stories': 3,
         'mainroad': 'yes',
         'guestroom': 'no',
@@ -56,7 +56,7 @@ def test_invalid_furnishingstatus(client):
         'airconditioning': 'yes',
         'parking': 2,
         'prefarea': 'yes',
-        'furnishingstatus': 'luxury'  # Invalid furnishingstatus
+        'furnishingstatus': 'luxury'
     })
     assert response.status_code == 400
     assert 'error' in response.json
