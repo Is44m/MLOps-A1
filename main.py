@@ -219,3 +219,4 @@ np.save('best_theta.npy', best_theta)
 # Optionally, save the means and standard deviations for scaling back the predictions
 np.save('y_mean_std.npy', [y_mean, y_std])
 np.save('X_mean_std.npy', [X_mean, X_std])
+print(X_encoded.head())
