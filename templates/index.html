@@ -80,29 +80,34 @@
         <form id="house-form">
             <div class="form-group">
                 <label for="area">Area (sqft)</label>
-                <input type="number" id="area" name="area" required>
+                <input type="number" id="area" name="area" value="2500" required>
             </div>
 
             <div class="form-group">
                 <label for="bedrooms">Bedrooms</label>
-                <input type="number" id="bedrooms" name="bedrooms" required>
+                <input type="number" id="bedrooms" name="bedrooms" value="3" required>
             </div>
 
             <div class="form-group">
                 <label for="bathrooms">Bathrooms</label>
-                <input type="number" id="bathrooms" name="bathrooms" required>
+                <input type="number" id="bathrooms" name="bathrooms" value="2" required>
             </div>
 
             <div class="form-group">
                 <label for="stories">Stories</label>
-                <input type="number" id="stories" name="stories" required>
+                <input type="number" id="stories" name="stories" value="2" required>
+            </div>
+
+            <div class="form-group">
+                <label for="parking">Parking Spaces</label>
+                <input type="number" id="parking" name="parking" value="1" required>
             </div>
 
             <div class="form-group-inline">
                 <div class="form-group">
                     <label for="mainroad">Main Road</label>
                     <select id="mainroad" name="mainroad" required>
-                        <option value="yes">Yes</option>
+                        <option value="yes" selected>Yes</option>
                         <option value="no">No</option>
                     </select>
                 </div>
@@ -111,7 +116,7 @@
                     <label for="guestroom">Guest Room</label>
                     <select id="guestroom" name="guestroom" required>
                         <option value="yes">Yes</option>
-                        <option value="no">No</option>
+                        <option value="no" selected>No</option>
                     </select>
                 </div>
             </div>
@@ -121,7 +126,7 @@
                     <label for="basement">Basement</label>
                     <select id="basement" name="basement" required>
                         <option value="yes">Yes</option>
-                        <option value="no">No</option>
+                        <option value="no" selected>No</option>
                     </select>
                 </div>
 
@@ -129,7 +134,7 @@
                     <label for="hotwaterheating">Hot Water Heating</label>
                     <select id="hotwaterheating" name="hotwaterheating" required>
                         <option value="yes">Yes</option>
-                        <option value="no">No</option>
+                        <option value="no" selected>No</option>
                     </select>
                 </div>
             </div>
@@ -138,30 +143,25 @@
                 <div class="form-group">
                     <label for="airconditioning">Air Conditioning</label>
                     <select id="airconditioning" name="airconditioning" required>
-                        <option value="yes">Yes</option>
+                        <option value="yes" selected>Yes</option>
                         <option value="no">No</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="parking">Parking</label>
-                    <input type="number" id="parking" name="parking" required>
+                    <label for="prefarea">Preferred Area</label>
+                    <select id="prefarea" name="prefarea" required>
+                        <option value="yes">Yes</option>
+                        <option value="no" selected>No</option>
+                    </select>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label for="prefarea">Preferred Area</label>
-                <select id="prefarea" name="prefarea" required>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                </select>
             </div>
 
             <div class="form-group">
                 <label for="furnishingstatus">Furnishing Status</label>
                 <select id="furnishingstatus" name="furnishingstatus" required>
                     <option value="furnished">Furnished</option>
-                    <option value="semi-furnished">Semi-Furnished</option>
+                    <option value="semi-furnished" selected>Semi-Furnished</option>
                     <option value="unfurnished">Unfurnished</option>
                 </select>
             </div>
@@ -172,5 +172,43 @@
         <div class="result" id="result"></div>
     </div>
 
+    <script>
+        document.getElementById('house-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                area: document.getElementById('area').value,
+                bedrooms: document.getElementById('bedrooms').value,
+                bathrooms: document.getElementById('bathrooms').value,
+                stories: document.getElementById('stories').value,
+                parking: document.getElementById('parking').value,
+                mainroad: document.getElementById('mainroad').value,
+                guestroom: document.getElementById('guestroom').value,
+                basement: document.getElementById('basement').value,
+                hotwaterheating: document.getElementById('hotwaterheating').value,
+                airconditioning: document.getElementById('airconditioning').value,
+                prefarea: document.getElementById('prefarea').value,
+                furnishingstatus: document.getElementById('furnishingstatus').value
+            };
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('result').textContent = `Predicted Price: $ ${result.predicted_price.toFixed(2)}`;
+                } else {
+                    document.getElementById('result').textContent = `Error: ${result.error}`;
+                }
+            } catch (error) {
+                document.getElementById('result').textContent = 'Error: Failed to fetch prediction';
+            }
+        });
+    </script>
+    
 </body>
 </html>
