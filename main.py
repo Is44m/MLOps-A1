@@ -19,13 +19,29 @@ X_encoded = pd.get_dummies(X, columns=categorical_cols)
 X_values = X_encoded.values
 
 # Normalize numerical features manually
+# Normalize numerical features manually
 def normalize_features(X, numerical_cols):
-    X_numeric = X[:, [X_encoded.columns.get_loc(col) for col in numerical_cols]]
+    # Get indices of the numerical columns
+    numeric_indices = [X_encoded.columns.get_loc(col) for col in numerical_cols]
+    
+    # Extract numerical data
+    X_numeric = X[:, numeric_indices]
+    
+    # Ensure X_numeric is a NumPy array (which it should be in this case)
+    X_numeric = np.array(X_numeric, dtype=float)
+    
+    # Calculate mean and standard deviation
     X_mean = X_numeric.mean(axis=0)
     X_std = X_numeric.std(axis=0)
+    
+    # Normalize the numerical columns
     X_numeric = (X_numeric - X_mean) / X_std
-    X[:, [X_encoded.columns.get_loc(col) for col in numerical_cols]] = X_numeric
+    
+    # Assign the normalized values back to the original array
+    X[:, numeric_indices] = X_numeric
+    
     return X, X_mean, X_std
+
 
 X_values, X_mean, X_std = normalize_features(X_values, numerical_cols)
 
@@ -60,11 +76,6 @@ X_test = np.hstack([np.ones((X_test.shape[0], 1)), X_test])
 # Initialize model parameters (weights)
 theta = np.zeros(X_train.shape[1])
 
-# Define hyperparameters
-learning_rate = 0.01  # Lower learning rate
-iterations = 4000       # Increase iterations
-regularization_param = 0.001  # L2 regularization
-
 # Define the cost function (with regularization)
 def compute_cost(X, y, theta, reg_param):
     m = len(y)
@@ -78,7 +89,13 @@ def compute_cost(X, y, theta, reg_param):
     return cost + reg_cost
 
 # Define the gradient descent function (with regularization)
+# Define the gradient descent function (with regularization)
 def gradient_descent(X, y, theta, learning_rate, iterations, reg_param):
+    # Ensure that all inputs are of float64 type to avoid casting issues
+    X = np.array(X, dtype=np.float64)
+    y = np.array(y, dtype=np.float64)
+    theta = np.array(theta, dtype=np.float64)
+    
     m = len(y)
     for i in range(iterations):
         predictions = X @ theta
@@ -88,6 +105,7 @@ def gradient_descent(X, y, theta, learning_rate, iterations, reg_param):
         # Regularization term (skip bias term)
         gradient[1:] += (reg_param / m) * theta[1:]
         
+        # Update the weights
         theta -= learning_rate * gradient
         
         if i % 100 == 0:
@@ -96,17 +114,77 @@ def gradient_descent(X, y, theta, learning_rate, iterations, reg_param):
     
     return theta
 
-# Train the model
-theta = gradient_descent(X_train, y_train, theta, learning_rate, iterations, regularization_param)
+# Convert predictions and true values back to original scale
+def convert_to_original_scale(y_normalized, y_mean, y_std):
+    return y_normalized * y_std + y_mean
 
-# Print the trained weights
-print("Trained weights (theta):", theta)
+# Calculate the accuracy of the model
+def calculate_rmse(y_true, y_pred):
+    mse = np.mean((y_true - y_pred) ** 2)
+    rmse = np.sqrt(mse)
+    return rmse
+
+# Grid search hyperparameter optimization
+# Hyperparameter grid search
+def grid_search_hyperparameters(X_train, X_test, y_train, y_test, learning_rates, iterations_list, regularizations):
+    best_rmse = float('inf')
+    best_hyperparams = None
+    best_theta = None
+    
+    for lr in learning_rates:
+        for iters in iterations_list:
+            for reg in regularizations:
+                print(f"Testing with learning rate: {lr}, iterations: {iters}, regularization: {reg}")
+                
+                # Initialize model parameters (weights)
+                theta = np.zeros(X_train.shape[1])
+                
+                # Train the model with the current hyperparameters
+                theta = gradient_descent(X_train, y_train, theta, lr, iters, reg)
+                
+                # Make predictions on the test set
+                y_pred_normalized = predict(X_test, theta)
+                
+                # Convert predictions and true values back to original scale
+                y_pred = convert_to_original_scale(y_pred_normalized, y_mean, y_std)
+                y_test_original = convert_to_original_scale(y_test, y_mean, y_std)
+                
+                # Calculate RMSE
+                rmse = calculate_rmse(y_test_original, y_pred)
+                print(f"RMSE: {rmse}")
+                
+                # Track the best hyperparameters
+                if rmse < best_rmse:
+                    best_rmse = rmse
+                    best_hyperparams = (lr, iters, reg)
+                    best_theta = theta
+    
+    return best_rmse, best_hyperparams, best_theta
+
+
 
 # Predict on test set
 def predict(X, theta):
     return X @ theta
 
-y_pred_normalized = predict(X_test, theta)
+# Define potential values for hyperparameters
+learning_rates = [0.001, 0.01, 0.1]
+iterations_list = [2000, 4000, 6000]
+reg_params = [0.0001, 0.001, 0.01]
+
+
+# Perform grid search
+best_rmse, best_hyperparams, best_theta = grid_search_hyperparameters(
+    X_train, X_test, y_train, y_test, learning_rates, iterations_list, reg_params
+)
+
+
+# Print the best results
+print(f"Best RMSE: {best_rmse}")
+print(f"Best hyperparameters: {best_hyperparams}")
+
+# Predict on test set using best theta
+y_pred_normalized = predict(X_test, best_theta)
 
 # Convert predictions and true values back to original scale
 def convert_to_original_scale(y_normalized, y_mean, y_std):
@@ -115,17 +193,20 @@ def convert_to_original_scale(y_normalized, y_mean, y_std):
 y_pred = convert_to_original_scale(y_pred_normalized, y_mean, y_std)
 y_test_original = convert_to_original_scale(y_test, y_mean, y_std)
 
-# Calculate the accuracy of the model
+# Calculate RMSE on test set
 def calculate_rmse(y_true, y_pred):
     mse = np.mean((y_true - y_pred) ** 2)
     rmse = np.sqrt(mse)
     return rmse
 
 rmse = calculate_rmse(y_test_original, y_pred)
-print(f"Root Mean Squared Error (RMSE) on test set: {rmse}")
+print(f"Final Root Mean Squared Error (RMSE) on test set: {rmse}")
 
 # Example prediction
-predicted_price = predict(X_test[:1], theta)
+def predict(X, theta):
+    return X @ theta
+
+predicted_price = predict(X_test[:1], best_theta)
 predicted_price_actual = convert_to_original_scale(predicted_price, y_mean, y_std)
 
 print(f"Predicted price for first test house: {predicted_price_actual[0]}, Actual price: {y_test_original[:1].values[0]}")
