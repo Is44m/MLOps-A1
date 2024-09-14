@@ -210,3 +210,11 @@ predicted_price = predict(X_test[:1], best_theta)
 predicted_price_actual = convert_to_original_scale(predicted_price, y_mean, y_std)
 
 print(f"Predicted price for first test house: {predicted_price_actual[0]}, Actual price: {y_test_original[:1].values[0]}")
+
+
+# Save the best theta (model weights) for future use in a Flask endpoint
+np.save('best_theta.npy', best_theta)
+
+# Optionally, save the means and standard deviations for scaling back the predictions
+np.save('y_mean_std.npy', [y_mean, y_std])
+np.save('X_mean_std.npy', [X_mean, X_std])
