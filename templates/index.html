@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Price Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-group-inline {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-group-inline .form-group {
+            width: 48%;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>House Price Prediction</h1>
+
+        <form id="house-form">
+            <div class="form-group">
+                <label for="area">Area (sqft)</label>
+                <input type="number" id="area" name="area" required>
+            </div>
+
+            <div class="form-group">
+                <label for="bedrooms">Bedrooms</label>
+                <input type="number" id="bedrooms" name="bedrooms" required>
+            </div>
+
+            <div class="form-group">
+                <label for="bathrooms">Bathrooms</label>
+                <input type="number" id="bathrooms" name="bathrooms" required>
+            </div>
+
+            <div class="form-group">
+                <label for="stories">Stories</label>
+                <input type="number" id="stories" name="stories" required>
+            </div>
+
+            <div class="form-group-inline">
+                <div class="form-group">
+                    <label for="mainroad">Main Road</label>
+                    <select id="mainroad" name="mainroad" required>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="guestroom">Guest Room</label>
+                    <select id="guestroom" name="guestroom" required>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group-inline">
+                <div class="form-group">
+                    <label for="basement">Basement</label>
+                    <select id="basement" name="basement" required>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="hotwaterheating">Hot Water Heating</label>
+                    <select id="hotwaterheating" name="hotwaterheating" required>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group-inline">
+                <div class="form-group">
+                    <label for="airconditioning">Air Conditioning</label>
+                    <select id="airconditioning" name="airconditioning" required>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="parking">Parking</label>
+                    <input type="number" id="parking" name="parking" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="prefarea">Preferred Area</label>
+                <select id="prefarea" name="prefarea" required>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="furnishingstatus">Furnishing Status</label>
+                <select id="furnishingstatus" name="furnishingstatus" required>
+                    <option value="furnished">Furnished</option>
+                    <option value="semi-furnished">Semi-Furnished</option>
+                    <option value="unfurnished">Unfurnished</option>
+                </select>
+            </div>
+
+            <button type="submit">Predict Price</button>
+        </form>
+
+        <div class="result" id="result"></div>
+    </div>
+
+</body>
+</html>
