@@ -15,6 +15,7 @@ numerical_cols = X.select_dtypes(include=['number']).columns
 # Convert categorical features to numeric using one-hot encoding
 X_encoded = pd.get_dummies(X, columns=categorical_cols)
 
+
 # Convert to numpy array
 X_values = X_encoded.values
 
