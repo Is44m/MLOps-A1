@@ -1,6 +1,6 @@
 import pytest
 import json
-from myapp import app  # Ensure this import is correct
+from api.app import app  # Ensure this import is correct
 
 @pytest.fixture
 def client():
