@@ -2,7 +2,13 @@ from flask import Flask, request, jsonify, render_template
 import numpy as np
 import pandas as pd
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    return "App is running!", 200
+
+
 
 # Load the model parameters and scaling parameters
 best_theta = np.load('best_theta.npy')
@@ -120,7 +126,6 @@ def predict_endpoint():
         # Log the error for debugging
         app.logger.error(f'Exception occurred: {str(e)}')
         return jsonify({'error': 'An error occurred'}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True)
